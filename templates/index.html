@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispatch — ask, and it answers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<main class="pad">
+
+    <div class="postmark" id="postmark" aria-hidden="true"></div>
+
+    <header class="hero">
+        <h1 class="hero-title" id="heroTitle" aria-label="Tell it what's on your mind.">
+            <span class="hero-typed" id="heroTyped"></span><span class="hero-caret" id="heroCaret"></span>
+        </h1>
+        <p class="hero-sub">Ask a question or hand it an email. It reads carefully, then writes back — nothing more theatrical than that.</p>
+    </header>
+
+    <section class="sheet" data-module="ask">
+        <div class="sheet-inner">
+            <h2>Ask something</h2>
+            <form id="askForm">
+                <input type="text" name="question" placeholder="What do you want to know?" autocomplete="off" required>
+                <button type="submit" class="stamp-btn"><span>Ask</span></button>
+            </form>
+            <div class="reading" data-state="idle">
+                <p class="reading-status" id="ans-loading">Reading it over<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span></p>
+                <div class="reading-out">
+                    <span class="mini-stamp" data-stamp="ask">Answered</span>
+                    <p class="reading-text" id="answer"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sheet" data-module="summarize">
+        <div class="sheet-inner">
+            <h2>Summarize an email</h2>
+            <form id="emailForm">
+                <textarea name="email" placeholder="Paste the email here — the longer, the better it's compressed." required></textarea>
+                <button type="submit" class="stamp-btn"><span>Summarize</span></button>
+            </form>
+            <div class="reading" data-state="idle">
+                <p class="reading-status" id="summary-loading">Reading it over<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span></p>
+                <div class="reading-out">
+                    <span class="mini-stamp" data-stamp="summarize">Summarized</span>
+                    <p class="reading-text" id="summary"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="foot">Every dispatch answered in its own words, not a script.</footer>
+
+</main>
+
+<script>
+// --- postmark: today's date, real content, not decoration ---
+(function () {
+    const el = document.getElementById("postmark");
+    const d = new Date();
+    const opts = { day: "2-digit", month: "short", year: "numeric" };
+    el.innerHTML = d.toLocaleDateString("en-GB", opts).toUpperCase().replace(/ /g, "&nbsp;");
+})();
+
+// --- hero: one-time typewriter draw-in ---
+(function () {
+    const text = "Tell it what's on your mind.";
+    const target = document.getElementById("heroTyped");
+    const caret = document.getElementById("heroCaret");
+    let i = 0;
+    function tick() {
+        if (i <= text.length) {
+            target.textContent = text.slice(0, i);
+            i++;
+            setTimeout(tick, 34 + Math.random() * 40);
+        } else {
+            caret.classList.add("settled");
+        }
+    }
+    tick();
+})();
+
+// --- typewriter reveal for a finished reading ---
+function revealText(el, text, speed = 12) {
+    el.textContent = "";
+    let i = 0;
+    const timer = setInterval(() => {
+        el.textContent += text[i];
+        i++;
+        if (i >= text.length) clearInterval(timer);
+    }, speed);
+}
+
+function setModuleState(name, state) {
+    const wrap = document.querySelector(`[data-module="${name}"] .reading`);
+    const stamp = document.querySelector(`[data-stamp="${name}"]`);
+    if (wrap) wrap.dataset.state = state;
+    if (state === "done" && stamp) {
+        stamp.classList.remove("thump");
+        void stamp.offsetWidth; // restart animation
+        stamp.classList.add("thump");
+    }
+}
+
+document.getElementById("askForm").onsubmit = async (e) => {
+    e.preventDefault();
+    let formData = new FormData(e.target);
+    setModuleState("ask", "listening");
+
+    let res = await fetch("/ask", { method: "POST", body: formData });
+    let data = await res.json();
+
+    setModuleState("ask", "done");
+    revealText(document.getElementById("answer"), data.response);
+};
+
+document.getElementById("emailForm").onsubmit = async (e) => {
+    e.preventDefault();
+    let formData = new FormData(e.target);
+    setModuleState("summarize", "listening");
+
+    let res = await fetch("/summarize", { method: "POST", body: formData });
+    let data = await res.json();
+
+    setModuleState("summarize", "done");
+    revealText(document.getElementById("summary"), data.response);
+};
+</script>
+
+</body>
+</html>

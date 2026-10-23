@@ -1,0 +1,332 @@
+/* ---------------------------------------------
+   Tokens
+--------------------------------------------- */
+:root {
+    --paper: #efe7d2;
+    --card: #fbf8f0;
+    --card-edge: #ddd2b3;
+    --ink: #211e19;
+    --muted: #6e6656;
+    --ribbon: #ae3728;
+    --ribbon-dim: rgba(174, 55, 40, 0.18);
+    --font-display: "Special Elite", "Courier New", monospace;
+    --font-body: "Libre Franklin", Arial, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+body {
+    background-color: var(--paper);
+    background-image:
+        radial-gradient(rgba(0,0,0,0.035) 1px, transparent 1px);
+    background-size: 3px 3px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    padding: 56px 22px 60px;
+    line-height: 1.6;
+}
+
+.pad {
+    max-width: 620px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* ---------------------------------------------
+   Postmark (today's date, real content)
+--------------------------------------------- */
+.postmark {
+    position: absolute;
+    top: -18px;
+    right: 0;
+    font-family: var(--font-body);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--ribbon);
+    border: 1.5px solid var(--ribbon);
+    border-radius: 50%;
+    width: 66px;
+    height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transform: rotate(9deg);
+    opacity: 0.75;
+    line-height: 1.25;
+}
+
+/* ---------------------------------------------
+   Hero
+--------------------------------------------- */
+.hero {
+    margin-bottom: 52px;
+    padding-top: 30px;
+}
+
+.hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 5.2vw, 2.7rem);
+    line-height: 1.32;
+    color: var(--ink);
+    min-height: 2.7em;
+}
+
+.hero-caret {
+    display: inline-block;
+    width: 0.55em;
+    height: 0.95em;
+    background: var(--ribbon);
+    vertical-align: -0.12em;
+    margin-left: 2px;
+    animation: caretBlink 0.85s steps(1) infinite;
+}
+
+.hero-caret.settled {
+    animation: caretBlink 0.85s steps(1) infinite;
+    opacity: 0.85;
+}
+
+@keyframes caretBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.hero-sub {
+    max-width: 48ch;
+    color: var(--muted);
+    font-size: 15px;
+    margin-top: 18px;
+}
+
+/* ---------------------------------------------
+   Sheets (torn note-pad cards, stacked)
+--------------------------------------------- */
+.sheet {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.sheet::before,
+.sheet::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    height: 100%;
+    background: var(--card-edge);
+    border-radius: 2px;
+    z-index: 0;
+}
+
+.sheet::before {
+    top: 6px;
+    transform: rotate(-0.6deg);
+}
+
+.sheet::after {
+    top: 10px;
+    left: 16px;
+    right: 4px;
+    transform: rotate(0.9deg);
+    opacity: 0.7;
+}
+
+.sheet-inner {
+    position: relative;
+    z-index: 1;
+    background: var(--card);
+    border: 1px solid var(--card-edge);
+    border-radius: 2px;
+    padding: 28px 26px 24px;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 27px,
+        rgba(33,30,25,0.05) 28px
+    );
+}
+
+.sheet-inner::before {
+    content: "";
+    display: block;
+    height: 0;
+    border-top: 2px dashed var(--card-edge);
+    margin: -28px -26px 22px;
+}
+
+.sheet-inner h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.25rem;
+    color: var(--ink);
+    margin-bottom: 16px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    background: transparent;
+    color: var(--ink);
+    border: none;
+    border-bottom: 1.5px solid var(--card-edge);
+    padding: 8px 2px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    resize: vertical;
+    min-height: 38px;
+    transition: border-color 0.2s ease;
+}
+
+textarea {
+    min-height: 92px;
+    border: 1.5px solid var(--card-edge);
+    border-radius: 2px;
+    padding: 10px 12px;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #a39c86;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--ribbon);
+}
+
+/* ---------------------------------------------
+   Stamp button
+--------------------------------------------- */
+.stamp-btn {
+    align-self: flex-start;
+    background: transparent;
+    color: var(--ribbon);
+    border: 2px solid var(--ribbon);
+    border-radius: 3px;
+    padding: 9px 22px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    margin-top: 4px;
+    transform: rotate(-0.6deg);
+    transition: transform 0.08s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.stamp-btn:hover {
+    background: var(--ribbon-dim);
+}
+
+.stamp-btn:active {
+    transform: rotate(-0.6deg) scale(0.93) translateY(1px);
+}
+
+/* ---------------------------------------------
+   Reading (output) area
+--------------------------------------------- */
+.reading {
+    margin-top: 18px;
+    min-height: 20px;
+}
+
+.reading-status {
+    display: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-style: italic;
+}
+
+.reading[data-state="listening"] .reading-status {
+    display: block;
+}
+
+.reading[data-state="listening"] .reading-out,
+.reading[data-state="idle"] .reading-out {
+    display: none;
+}
+
+.reading[data-state="done"] .reading-out {
+    display: block;
+}
+
+.ellipsis span {
+    animation: blink 1.3s infinite;
+    opacity: 0;
+}
+.ellipsis span:nth-child(1) { animation-delay: 0s; }
+.ellipsis span:nth-child(2) { animation-delay: 0.2s; }
+.ellipsis span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+    0%, 20% { opacity: 0; }
+    40% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.reading-out {
+    padding-top: 6px;
+}
+
+.mini-stamp {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ribbon);
+    border: 1.5px solid var(--ribbon);
+    border-radius: 2px;
+    padding: 3px 9px;
+    margin-bottom: 10px;
+    transform: rotate(-3deg) scale(1);
+    opacity: 0.9;
+}
+
+.mini-stamp.thump {
+    animation: stampThump 0.42s cubic-bezier(.2,1.6,.4,1);
+}
+
+@keyframes stampThump {
+    0%   { transform: rotate(-3deg) scale(2.4); opacity: 0; }
+    55%  { transform: rotate(-3deg) scale(0.92); opacity: 1; }
+    75%  { transform: rotate(-3deg) scale(1.06); }
+    100% { transform: rotate(-3deg) scale(1); }
+}
+
+.reading-text {
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* ---------------------------------------------
+   Footer
+--------------------------------------------- */
+.foot {
+    margin-top: 44px;
+    color: #a39c86;
+    font-size: 12.5px;
+    font-style: italic;
+    text-align: center;
+}
